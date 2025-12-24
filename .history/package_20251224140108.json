@@ -1,0 +1,24 @@
+{
+  "name": "filesync",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "clean": "turbo clean && rm -rf node_modules"
+    "publish:all": "pnpm build && pnpm -r publish --access public"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.4",
+    "@biomejs/biome": "^2.3.10",
+    "turbo": "^2.7.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "packageManager": "pnpm@10.22.5",
+  "engines": {
+    "node": ">=24"
+  }
+}
