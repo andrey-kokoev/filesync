@@ -57,12 +57,53 @@ export async function syncMirrors(
   return results;
 }
 
-export async function loadConfig(cwd: string): Promise<MirrorConfig | null> {
-  const configPath = path.join(cwd, "filesync.config.json");
+export interface LoadedConfig {
+  config: MirrorConfig;
+  path: string;
+}
+
+interface LoadConfigOptions {
+  cwd: string;
+  configPath?: string | null;
+}
+
+async function findConfigPath(cwd: string): Promise<string | null> {
+  let current = path.resolve(cwd);
+
+  while (true) {
+    const candidate = path.join(current, "filesync.config.json");
+
+    try {
+      await fs.access(candidate);
+      return candidate;
+    } catch {
+      const parent = path.dirname(current);
+      if (parent === current) {
+        return null;
+      }
+      current = parent;
+    }
+  }
+}
+
+export async function loadConfig(
+  options: LoadConfigOptions,
+): Promise<LoadedConfig | null> {
+  const configPath =
+    options.configPath != null
+      ? path.resolve(options.cwd, options.configPath)
+      : await findConfigPath(options.cwd);
+
+  if (!configPath) {
+    return null;
+  }
 
   try {
     const content = await fs.readFile(configPath, "utf8");
-    return JSON.parse(content) as MirrorConfig;
+    return {
+      config: JSON.parse(content) as MirrorConfig,
+      path: configPath,
+    };
   } catch {
     return null;
   }

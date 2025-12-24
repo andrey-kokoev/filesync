@@ -2,7 +2,36 @@
 import path from "node:path";
 import { loadConfig, syncMirrors } from "./index.js";
 
-const args = new Set(process.argv.slice(2));
+const argv = process.argv.slice(2);
+const args = new Set<string>();
+let configPath: string | null = null;
+
+for (let i = 0; i < argv.length; i++) {
+  const arg = argv[i];
+
+  if (arg === "--config") {
+    const value = argv[i + 1];
+    if (!value || value.startsWith("-")) {
+      console.error("filesync-mirrors: --config requires a path");
+      process.exit(1);
+    }
+    configPath = value;
+    i++;
+    continue;
+  }
+
+  if (arg.startsWith("--config=")) {
+    const value = arg.slice("--config=".length);
+    if (!value) {
+      console.error("filesync-mirrors: --config requires a path");
+      process.exit(1);
+    }
+    configPath = value;
+    continue;
+  }
+
+  args.add(arg);
+}
 
 if (args.has("--help") || args.has("-h")) {
   console.log(`
@@ -14,6 +43,7 @@ Usage:
   filesync-mirrors [options]
 
 Options:
+  --config    Path to filesync.config.json
   --dry-run   Report changes without writing files
   --check     Exit non-zero if changes would be made
   --list      Print each source file discovered
@@ -35,13 +65,14 @@ function log(message: string): void {
 }
 
 const cwd = process.cwd();
-const config = await loadConfig(cwd);
+const loadedConfig = await loadConfig({ cwd, configPath });
 
-if (!config) {
+if (!loadedConfig) {
   console.error("No filesync.config.json found");
   process.exit(1);
 }
 
+const config = loadedConfig.config;
 const results = await syncMirrors({
   config,
   dryRun,

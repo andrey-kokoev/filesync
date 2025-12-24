@@ -25,6 +25,9 @@ npx @filesync/mirrors --list
 
 # Quiet mode (only print errors)
 npx @filesync/mirrors --quiet
+
+# Use an explicit config path
+npx @filesync/mirrors --config path/to/filesync.config.json
 ```
 
 ## Configuration
@@ -46,6 +49,12 @@ Create `filesync.config.json` in your project root:
 
 - **source**: Glob pattern to find source files
 - **targets**: Array of relative paths for mirror destinations (relative to each source file's directory)
+
+### Config Resolution
+
+- If `--config` is not provided, the CLI searches for `filesync.config.json` from the invocation directory upward.
+- Syncing is always scoped to the invocation directory and below, even if the config file is found higher up.
+- If no config is found, the CLI exits with a non-zero status and prints an error.
 
 ## Programmatic API
 
