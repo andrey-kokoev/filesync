@@ -1,0 +1,28 @@
+{
+  "name": "@filesync/portals",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "filesync-portals": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@filesync/core": "workspace:*",
+    "@filesync/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
